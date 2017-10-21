@@ -1,2 +1,2 @@
 # Volleyball
-Game
+Simple game to simulate a Volleyball game.
