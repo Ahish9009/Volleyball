@@ -60,27 +60,35 @@ def ballside(x,tracker_x,lr,side): #mainly for player position hence middle case
 
 def checkcontact(x,y,x_blue,y_blue):
     contact=False
-    if x<x_blue: #check contact on top left edge
+    pos=''
+    if y+72>y_blue:
+        if x<x_blue: #check contact on top left edge
 
-        overlap = y+72-y_blue
-        y1=72-overlap
+            overlap = y+72-y_blue
+            y1=72-overlap
 
-        for i in range(72,y1,-1):
-            if x_b>x+ball_coordinates[i][1]:
-                return False
-            else:
-                return True
-    if x>x_blue+85-36:
-        overlap = y+72-y_blue
-        y1=72-overlap
+            for i in range(72,y1,-1):
+                if x_blue>x+ball_coordinates[i][1]:
+                    contact=False
+                else:
+                    contact=True
+                    pos='lt'
+            return contact,pos #left top
+                    
+        if x>x_blue+85-36: #check contact on right edge of player
+            overlap = y+72-y_blue
+            y1=72-overlap
+            
+            for i in range(72,y1,-1):
+                if x_blue+85<x+ball_coordinates[i][0]:
+                    contact=False
+                else:
+                    contact=True
+                    pos='rt'
+            return contact,pos #right top
+    elif y+72<y_blue:
+        return contact, pos
         
-        for i in range(72,y1,-1):
-            if x_blue<x+ball_coordinates[i][0]:
-                contact=False
-            else:
-                contact=True
-        return contact
-    
 def get_playerbpos(x,y,x_blue,y_blue,lr,side,tracker_x,movement):
 
     if movement=='l':
@@ -109,8 +117,7 @@ def get_playerbpos(x,y,x_blue,y_blue,lr,side,tracker_x,movement):
 
         if y+72>=y_blue and y<y_blue: #when part of the ball is below the players top
             
-            contact=checkcontact(x,y,x_blue,y_blue)
-            print contact
+            contact,pos=checkcontact(x,y,x_blue,y_blue)
             if contact:
                 return x_blue
             
