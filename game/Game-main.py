@@ -57,6 +57,33 @@ i=True
 while i:
 
     if flag==0: #normal game
+        #to check if ball is in contact with the side of the player
+        contact,pos=fn.checkcontact(x,y,x_blue,y_blue)
+        if contact:
+            if lr==0:
+                if pos=='lt':
+                    ud=1
+                    angle=(0+angle)/2
+                if pos=='rt':
+                    ud=1
+                    angle=(angle+180)/2
+                
+            if lr==1: #if ball is moving towards the right
+                if pos=='lt':
+                    ud=1
+                    lr=fn.invert_lr(lr)
+                if pos=='rt':
+                    angle=180-angle
+                    ud=1
+            if lr==-1: #if ball is moving towards the left
+                if pos=='lt':
+                    ud=1
+                    angle=180-angle
+                if pos=='rt':
+                    ud=1
+                    lr=fn.invert_lr(lr)
+                    
+        
         x,y,angle,lr,ud=fn.get_ballpos(x,y,angle,lr,ud)
 
     for event in pg.event.get():
