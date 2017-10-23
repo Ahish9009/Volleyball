@@ -85,8 +85,72 @@ def checkcontact_top(y):
 def checkcontact_sides(x):
     if x<=0 or x+72>=800:
         return True
-    
 
+def checkcontact_RODtop(x,y,tracker_y):
+    contact=False
+    if x+36>=393 and x+36<=407:
+        if tracker_y[1]+72<300 and y+72>=300:
+            contact=True
+    return contact
+
+def checkcontact_RODside(x,y,tracker_x,lr):
+    contact=False
+    if y+36>300:
+        if x<=407 and tracker_x[3]>407 and lr==-1:
+            contact=True
+        elif x+72>=393 and tracker_x[3]+72<393 and lr==1:
+            contact=True
+
+    return contact
+
+def checkcontact_RODedge(x,y,tracker_y,lr,ud):
+    contact=False
+    toinvert=False
+
+    if y+72>=300 and y+36<300:
+
+        if x+36<393: #top left edge
+            
+            overlap=y+72-300
+            y1=72-overlap
+
+            for i in range(72,y1,-1):
+                if 393>x+ball_coordinates[i][1]:
+                    contact=False
+                else:
+                    contact=True
+                    if tracker_y[3]>=300+36:
+                        toinvert=1 #inverts only horizontal
+                    else:
+                        if lr==1:
+                            toinvert=2 #inverts vertical and horizontal
+                        if lr==-1:
+                            if ud==1:
+                                toinvert=1
+                            if ud==-1:
+                                toinvert=3 #inverts only vertical
+
+        if x+36>407: #top right edge
+            overlap=y+72-300
+            y1=72-overlap
+
+            for i in range(72,y1,-1):
+                if 407<x+ball_coordinates[i][0]:
+                    contact=False
+                else:
+                    contact=True
+                    if tracker_y[3]>=300+36:
+                        toinvert=1 #inverts only horizontal
+                    else: 
+                        if lr==1:
+                            toinvert=3 #inverts only vertical
+                        if lr==-1:
+                            if ud==1:
+                                toinvert=1
+                            if ud==-1:
+                                toinvert=2 #inverts vertical and horizontal
+    return contact,toinvert
+    
 def checkcontact_BLUEedge(x,y,x_blue,y_blue):
     contact=False
     pos=''
@@ -190,11 +254,10 @@ def get_playerbpos(x,y,x_blue,y_blue,lr,side,tracker_x,movement):
                 return x_blue
 
         if y+72>=y_blue and y+36<y_blue: #when part of the ball is below the players top
-            
             contact,pos=checkcontact_BLUEedge(x,y,x_blue,y_blue)
+
             if contact:
-                return x_blue
-            
+                return x_blue            
             else:
                 if x_blue==407:
                     if change==1:
@@ -270,14 +333,33 @@ def get_playerbpos(x,y,x_blue,y_blue,lr,side,tracker_x,movement):
                     x_blue+=change
                     return x_blue           
 
-def get_details_s1(angle,lr,ud,pos_e,pos_s,bluevel,contact_top,contact_sides,contact_BLUEe,contact_BLUEt,contact_BLUEs): #s1 for side=1
+def get_details_s1(angle,lr,ud,pos_e,pos_s,toinvert,bluevel,contact_top,contact_sides,contact_RODs,contact_RODe,contact_RODt,contact_BLUEe,contact_BLUEt,contact_BLUEs): #s1 for side=1
 
-    if contact_top:
+    if contact_top: 
         ud=-1
         angle=180-angle #to reflect the ball
 
     elif contact_sides:
         lr=invert(lr)
+        angle=180-angle
+
+    elif contact_RODs:
+        lr=invert(lr)
+        angle=180-angle
+
+    elif contact_RODe:
+        if toinvert==1:
+            lr=invert(lr)
+            angle=180-angle
+        if toinvert==2:
+            lr=invert(lr)
+            ud=invert(ud)
+        if toinvert==3:
+            ud=invert(ud)
+            angle=180-angle
+
+    elif contact_RODt:
+        ud=invert(ud)
         angle=180-angle
 
     elif contact_BLUEt: #if the ball is touching the top face of the ball
@@ -301,7 +383,7 @@ def get_details_s1(angle,lr,ud,pos_e,pos_s,bluevel,contact_top,contact_sides,con
             ud=invert(ud)
             if lr==0:
                 angle=(angle+0)/2
-                lr=1
+                lr=-1
             elif lr==1:
                 angle=180-angle
                 angle=(90+angle)/2
@@ -352,11 +434,11 @@ def get_details_s1(angle,lr,ud,pos_e,pos_s,bluevel,contact_top,contact_sides,con
                 lr=invert(lr)
 
     return angle,lr,ud
+
                  
 def get_ballpos(x,y,angle,lr,ud):
 
     if lr==0:
-    
         if ud==-1:
             y+=2
             return x,y,angle,lr,ud
@@ -377,13 +459,12 @@ def get_ballpos(x,y,angle,lr,ud):
             dx=2/m
             y-=2
             x+=dx
-
         elif ud==-1: #moving downwards and angle is already acute 
             m=math.tan(math.radians(angle))
             dx=2/m
             y+=2
             x+=dx
-            
+   
         return x,y,angle,lr,ud
 
     if lr==-1:
@@ -400,8 +481,3 @@ def get_ballpos(x,y,angle,lr,ud):
             x-=dx
          
         return x,y,angle,lr,ud
-    
-
-
-
-    
