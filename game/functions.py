@@ -58,11 +58,13 @@ def ballside(x,tracker_x,lr,side): #mainly for player position hence middle case
 
     return side
 
-def checkcontact(x,y,x_blue,y_blue):
+def checkcontact_BLUEedge(x,y,x_blue,y_blue):
     contact=False
     pos=''
-    if y+72>y_blue:
-        if x<x_blue: #check contact on top left edge
+    
+    if y+72>=y_blue:
+        
+        if x+36<x_blue: #check contact on top left edge
 
             overlap = y+72-y_blue
             y1=72-overlap
@@ -73,7 +75,7 @@ def checkcontact(x,y,x_blue,y_blue):
                 else:
                     contact=True
                     pos='lt'
-            return contact,pos #left top
+            
                     
         if x>x_blue+85-36: #check contact on right edge of player
             overlap = y+72-y_blue
@@ -85,9 +87,10 @@ def checkcontact(x,y,x_blue,y_blue):
                 else:
                     contact=True
                     pos='rt'
-            return contact,pos #right top
+        return contact,pos
     elif y+72<y_blue:
         return contact, pos
+    
         
 def get_playerbpos(x,y,x_blue,y_blue,lr,side,tracker_x,movement):
 
@@ -117,7 +120,7 @@ def get_playerbpos(x,y,x_blue,y_blue,lr,side,tracker_x,movement):
 
         if y+72>=y_blue and y<y_blue: #when part of the ball is below the players top
             
-            contact,pos=checkcontact(x,y,x_blue,y_blue)
+            contact,pos=checkcontact_BLUEedge(x,y,x_blue,y_blue)
             if contact:
                 return x_blue
             
@@ -172,16 +175,36 @@ def get_playerbpos(x,y,x_blue,y_blue,lr,side,tracker_x,movement):
 def get_ballpos(x,y,angle,lr,ud):
 
     if lr==0:
-        if angle==90:
-            if ud==-1:
-                y+=2
-                return x,y,angle,ud,lr
-            if ud==1:
-                y-=2
-                return x,y,angle,ud,lr
-    return x,y,angle,ud,lr
-                    
-            
+    
+        if ud==-1:
+            y+=2
+            return x,y,angle,lr,ud
+        if ud==1:
+            y-=2
+            return x,y,angle,lr,ud
+        return x,y,angle,lr,ud
+
+    if lr==1: #moving to the right
+        if ud==1: #moving upwards
+            #y=mx+c
+            #dy/dx=m
+            #dx/dy=1/m
+            #dx=2/m
+            #angle will be more than 90, thus it has to be made acute
+            temp=180-angle #makes it acute
+            m=math.tan(math.radians(temp)) #finds m (tan theta)
+            dx=2/m
+            y-=2
+            x+=dx
+        return x,y,angle,lr,ud
+
+    if lr==-1:
+        if ud==1:
+            m=math.tan(math.radians(angle))
+            dx=2/m
+            y-=2
+            x-=dx
+        return x,y,angle,lr,ud
     
 
 
