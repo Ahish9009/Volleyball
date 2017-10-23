@@ -1,4 +1,3 @@
-
 #Volleyball simulation
 import pygame as pg, math
 import functions as fn
@@ -60,20 +59,30 @@ while i:
     if flag==0: #normal game
         #get velocity of blue player
         bluevel=fn.get_bluevel(tracker_Bx)
-
+    
+        #checks if the ball touches the edges of the screen
         #to check if the ball is in contact with the top
         contact_top=fn.checkcontact_top(y)
         #to check if the ball is in contact with the sides
         contact_sides=fn.checkcontact_sides(x)
-        
+
+        #checks if the ball touches the blue player
         #to check if ball is in contact with the side of the player
         contact_BLUEe,pos_e=fn.checkcontact_BLUEedge(x,y,x_blue,y_blue)
         #to check if the ball is in contact with the top of the player
         contact_BLUEt=fn.checkcontact_BLUEtop(x,y,x_blue,y_blue,tracker_y)
         #to check if the ball is in contact with the side of the player
         contact_BLUEs,pos_s=fn.checkcontact_BLUEside(x,y,x_blue,y_blue,tracker_x,lr)
+
+        #checks if the ball touches the rod
+        #to check if the ball is in contact with the side of the rod
+        contact_RODs=fn.checkcontact_RODside(x,y,tracker_x,lr)
+        #to check if the ball is in contact with the edge of the rod
+        contact_RODe,toinvert=fn.checkcontact_RODedge(x,y,tracker_y,lr,ud)
+        #to check if the ball is in contact with the top of the rod
+        contact_RODt=fn.checkcontact_RODtop(x,y,tracker_y)
         
-        angle,lr,ud=fn.get_details_s1(angle,lr,ud,pos_e,pos_s,bluevel,contact_top,contact_sides,contact_BLUEe,contact_BLUEt,contact_BLUEs)
+        angle,lr,ud=fn.get_details_s1(angle,lr,ud,pos_e,pos_s,toinvert,bluevel,contact_top,contact_sides,contact_RODs,contact_RODe,contact_RODt,contact_BLUEe,contact_BLUEt,contact_BLUEs)
         
         x,y,angle,lr,ud=fn.get_ballpos(x,y,angle,lr,ud)
 
@@ -88,7 +97,7 @@ while i:
                 x_blue=fn.get_playerbpos(x,y,x_blue,y_blue,lr,side,tracker_x,'l')
 
     if y+72==600:
-        y=200
+        y=100
 
     screen.blit(bg, (0,0))
     screen.blit(rod, (393,300))
@@ -102,6 +111,6 @@ while i:
     side=fn.ballside(x,tracker_x,lr,side)
 
     pg.display.update()
-    clock.tick(60) #decides maximum fps
+    clock.tick(100) #decides maximum fps
 
 pg.quit()
