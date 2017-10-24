@@ -26,6 +26,15 @@ def load_images():
 
     return bg,rod,playerr,playerb,volleyball
 
+def lr_checker(tracker_x,x):
+    if tracker_x[1]>x:
+        lr=-1
+    elif tracker_x[1]<x:
+        lr=1
+    else:
+        lr=0
+    return lr
+
 #to invert directions
 def invert(variable):
     variable*=(-1)
@@ -36,6 +45,13 @@ def tracker_BLUEx(tracker_Bx,x_blue): #stores the last 5 positions of the ball w
     for i in range(4,0,-1):
         new[i]=new[i-1]
     new[0]=x_blue
+    return new #returns the new ball x tracker
+
+def tracker_REDx(tracker_Rx,x_red): #stores the last 5 positions of the ball with the latest being first
+    new=tracker_Rx
+    for i in range(4,0,-1):
+        new[i]=new[i-1]
+    new[0]=x_red
     return new #returns the new ball x tracker
 
 def tracker_ballx(tracker_x,x): #stores the last 5 positions of the ball with the latest being first
@@ -63,6 +79,17 @@ def get_bluevel(tracker_Bx): #Gets direction in which the blue player is moving
         bluevel=-1
         return bluevel
 
+def get_redvel(tracker_Rx): #Gets direction in which the blue player is moving
+    if tracker_Rx[0]==tracker_Rx[1]:
+        redvel=0
+        return redvel
+    if tracker_Rx[0]>tracker_Rx[1]:
+        redvel=1
+        return redvel
+    if tracker_Rx[0]<tracker_Rx[1]:
+        redvel=-1
+        return redvel
+
 def ballside(x,tracker_x,lr,side): #mainly for player position hence middle case not included
     if x<400 and tracker_x[1]<400:
         side=-1
@@ -73,10 +100,22 @@ def ballside(x,tracker_x,lr,side): #mainly for player position hence middle case
         if tracker_x[1]>400:
             side=-1 
             
-    if x<400 and tracker_x[1]>400:
+    if x>400 and tracker_x[1]>400:
         side=1
 
     return side
+
+def get_AI(side,lr,x,x_red):
+    if side==-1:
+        if lr==-1:
+            if x_red+40>=x:
+                if x_red>0:
+                    x_red-=2
+        if lr==1:
+            if x_red<=x:
+                if x_red+85<393:
+                    x_red+=2
+    return x_red
 
 def bluejump(y_blue,jumpblue,jumpbcount):
     if jumpbcount<100:
@@ -198,11 +237,55 @@ def checkcontact_BLUEedge(x,y,x_blue,y_blue):
         return contact, pos
     else:
         return contact, pos
+
+def checkcontact_REDedge(x,y,x_red,y_red):
+    contact=False
+    pos=''
+    
+    if y+72>=y_red and y+36<y_red: #if the lower half of the ball is touching the edge
+ 
+        if x+36<x_red: #check contact on top left edge
+
+            overlap = y+72-y_red
+            y1=72-overlap
+
+            for i in range(72,y1,-1):
+                if x_red>x+ball_coordinates[i][1]:
+                    contact=False
+                else:
+                    contact=True
+                    pos='lt'
+                    
+        if x+36>x_red+85: #check contact on right edge of player
+            overlap = y+72-y_red
+            y1=72-overlap
+            
+            for i in range(72,y1,-1):
+                
+                if x_red+85<x+ball_coordinates[i][0]:
+                    contact=False
+                else:
+                    contact=True
+                    pos='rt'
+                    
+        return contact,pos
+
+    elif y+72<y_red:
+        return contact, pos
+    else:
+        return contact, pos
         
 def checkcontact_BLUEtop(x,y,x_blue,y_blue,tracker_y):
     contact=False
     if x+36>=x_blue and x+36<=x_blue+85:
         if tracker_y[3]+72<y_blue and y+72>=y_blue:
+            contact=True
+    return contact
+
+def checkcontact_REDtop(x,y,x_red,y_red,tracker_y):
+    contact=False
+    if x+36>=x_red and x+36<=x_red+85:
+        if tracker_y[3]+72<y_red and y+72>=y_red:
             contact=True
     return contact
 
@@ -342,9 +425,9 @@ def get_playerbpos(x,y,x_blue,y_blue,lr,side,tracker_x,movement):
                     return x_blue
                 else:
                     x_blue+=change
-                    return x_blue           
+                    return x_blue
 
-def get_details_s1(y,angle,lr,ud,pos_e,pos_s,toinvert,bluevel,contact_top,contact_sides,contact_RODs,contact_RODe,contact_RODt,contact_BLUEe,contact_BLUEt,contact_BLUEs): #s1 for side=1
+def get_details_s1(y,angle,lr,ud,pos_Be,pos_Re,pos_s,toinvert,bluevel,redvel,contact_top,contact_sides,contact_RODs,contact_RODe,contact_RODt,contact_BLUEe,contact_BLUEt,contact_BLUEs,contact_REDe,contact_REDt): #s1 for side=1
 
     if contact_top: 
         ud=-1
@@ -374,7 +457,7 @@ def get_details_s1(y,angle,lr,ud,pos_e,pos_s,toinvert,bluevel,contact_top,contac
         angle=180-angle
 
     elif contact_BLUEt: #if the ball is touching the top face of the ball
-        
+
         if bluevel==0:
             y-=2
             angle=180-angle
@@ -412,27 +495,27 @@ def get_details_s1(y,angle,lr,ud,pos_e,pos_s,toinvert,bluevel,contact_top,contac
             
     elif contact_BLUEe: #if the ball is touching the corner of the player
             if lr==0:
-                if pos_e=='lt':
+                if pos_Be=='lt':
                     ud=1
                     angle=(0+angle)/2
                     lr=-1
-                if pos_e=='rt':
+                if pos_Be=='rt':
                     ud=1
                     angle=(angle+180)/2
                     lr=1
                 
             elif lr==1: #if ball is moving towards the right
-                if pos_e=='lt':
+                if pos_Be=='lt':
                     ud=1
                     lr=invert(lr)
-                if pos_e=='rt':
+                if pos_Be=='rt':
                     angle=180-angle
                     ud=1
             elif lr==-1: #if ball is moving towards the left
-                if pos_e=='lt':
+                if pos_Be=='lt':
                     ud=1
                     angle=180-angle
-                if pos_e=='rt':
+                if pos_Be=='rt':
                     ud=1
                     lr=invert(lr)
             y-=2
@@ -452,6 +535,70 @@ def get_details_s1(y,angle,lr,ud,pos_e,pos_s,toinvert,bluevel,contact_top,contac
             elif pos_s=='rs':
                 angle=180-angle
                 lr=invert(lr)
+
+    elif contact_REDt: #if the ball is touching the top face of the ball
+        
+        if redvel==0:
+            y-=2
+            angle=180-angle
+            ud=invert(ud)
+
+        elif redvel==1:
+            ud=invert(ud)
+            if lr==0:
+                angle=(angle+180)/2
+                lr=1
+                y-=2
+            elif lr==1:
+                angle=180-angle
+                angle=(180+angle)/2
+                y-=2
+            elif lr==-1:
+                angle=180-angle
+                angle=(90+angle)/2
+                y-=2
+
+        elif redvel==-1:
+            ud=invert(ud)
+            if lr==0:
+                y-=2
+                angle=(angle+0)/2
+                lr=-1
+            elif lr==1:
+                y-=2
+                angle=180-angle
+                angle=(90+angle)/2
+            elif lr==-1:
+                y-=2
+                angle=180-angle
+                angle=angle/2
+
+    elif contact_REDe:
+        if lr==0:
+            if pos_Re=='lt':
+                ud=1
+                angle=(0+angle)/2
+                lr=-1
+            if pos_Re=='rt':
+                ud=1
+                angle=(angle+180)/2
+                lr=1
+            
+        elif lr==1: #if ball is moving towards the right
+            if pos_Re=='lt':
+                ud=1
+                lr=invert(lr)
+            if pos_Re=='rt':
+                angle=180-angle
+                ud=1
+        elif lr==-1: #if ball is moving towards the left
+            if pos_Re=='lt':
+                ud=1
+                angle=180-angle
+            if pos_Re=='rt':
+                ud=1
+                lr=invert(lr)
+        y-=2
 
     return angle,lr,ud,y
 
