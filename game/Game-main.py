@@ -40,9 +40,9 @@ ud=-1
 side=1
 
 tracker_Bx=[0,0,0,0,0]
+tracker_Rx=[0,0,0,0,0]
 tracker_x=[0,0,0,0,0]
 tracker_y=[0,0,0,0,0]
-
 
 jumpblue=False
 
@@ -64,9 +64,15 @@ while i:
         if jumpblue:
             y_blue,jumpblue,jumpbcount=fn.bluejump(y_blue,jumpblue,jumpbcount)
             
+        #ai
+        x_red=fn.get_AI(side,lr,x,x_red)
         
+
         #get velocity of blue player
         bluevel=fn.get_bluevel(tracker_Bx)
+
+        #get velocity of red player
+        redvel=fn.get_redvel(tracker_Rx)
     
         #checks if the ball touches the edges of the screen
         #to check if the ball is in contact with the top
@@ -76,7 +82,7 @@ while i:
 
         #checks if the ball touches the blue player
         #to check if ball is in contact with the side of the player
-        contact_BLUEe,pos_e=fn.checkcontact_BLUEedge(x,y,x_blue,y_blue)
+        contact_BLUEe,pos_Be=fn.checkcontact_BLUEedge(x,y,x_blue,y_blue)
         #to check if the ball is in contact with the top of the player
         contact_BLUEt=fn.checkcontact_BLUEtop(x,y,x_blue,y_blue,tracker_y)
         #to check if the ball is in contact with the side of the player
@@ -91,19 +97,30 @@ while i:
         contact_RODt=fn.checkcontact_RODtop(x,y,tracker_y)
 
         #checks if the ball touches the red player
-        
-        angle,lr,ud,y=fn.get_details_s1(y,angle,lr,ud,pos_e,pos_s,toinvert,bluevel,contact_top,contact_sides,contact_RODs,contact_RODe,contact_RODt,contact_BLUEe,contact_BLUEt,contact_BLUEs)
+        #to check if the ball is in contact with the edge of the red player
+        contact_REDe,pos_Re=fn.checkcontact_REDedge(x,y,x_red,y_red)
+        #to check if the ball is in contact with the top of the red player
+        contact_REDt=fn.checkcontact_REDtop(x,y,x_red,y_red,tracker_y)
+
+        angle,lr,ud,y=fn.get_details_s1(y,angle,lr,ud,pos_Be,pos_Re,pos_s,toinvert,bluevel,redvel,contact_top,contact_sides,contact_RODs,contact_RODe,contact_RODt,contact_BLUEe,contact_BLUEt,contact_BLUEs,contact_REDe,contact_REDt)
+
+        if angle<25:
+            angle=25
+
+        if angle>155:
+            angle=155
         
         x,y,angle,lr,ud=fn.get_ballpos(x,y,angle,lr,ud)
 
     for event in pg.event.get():
-        if event.type==pg.QUIT:
+        if event.type==pg.QUIT: 
             i=False
 
         if event.type==pg.KEYDOWN:
+            
             if event.key==pg.K_RIGHT:
                 x_blue=fn.get_playerbpos(x,y,x_blue,y_blue,lr,side,tracker_x,'r')
-            if event.key==pg.K_LEFT:
+            elif event.key==pg.K_LEFT:
                 x_blue=fn.get_playerbpos(x,y,x_blue,y_blue,lr,side,tracker_x,'l')
             if event.key==pg.K_SPACE:
                 if not jumpblue:
@@ -119,7 +136,10 @@ while i:
     screen.blit(playerb, (x_blue,y_blue))
     screen.blit(volleyball, (x,y))
 
+    lr=fn.lr_checker(tracker_x,x) #as lr can go wrong
+
     tracker_Bx=fn.tracker_BLUEx(tracker_Bx,x_blue)
+    tracker_Rx=fn.tracker_REDx(tracker_Rx,x_red)
     tracker_x=fn.tracker_ballx(tracker_x,x)
     tracker_y=fn.tracker_bally(tracker_y,y)
     side=fn.ballside(x,tracker_x,lr,side)
