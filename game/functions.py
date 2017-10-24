@@ -78,6 +78,17 @@ def ballside(x,tracker_x,lr,side): #mainly for player position hence middle case
 
     return side
 
+def bluejump(y_blue,jumpblue,jumpbcount):
+    if jumpbcount<100:
+        y_blue-=2
+    elif jumpbcount>=100 and jumpbcount<150:
+        y_blue+=4
+    else:
+        y_blue=450
+        jumpblue=False
+    jumpbcount+=1
+    return y_blue,jumpblue,jumpbcount
+
 def checkcontact_top(y):
     if y<=0:
         return True
@@ -191,7 +202,7 @@ def checkcontact_BLUEedge(x,y,x_blue,y_blue):
 def checkcontact_BLUEtop(x,y,x_blue,y_blue,tracker_y):
     contact=False
     if x+36>=x_blue and x+36<=x_blue+85:
-        if tracker_y[1]+72<y_blue and y+72>=y_blue:
+        if tracker_y[3]+72<y_blue and y+72>=y_blue:
             contact=True
     return contact
 
@@ -333,7 +344,7 @@ def get_playerbpos(x,y,x_blue,y_blue,lr,side,tracker_x,movement):
                     x_blue+=change
                     return x_blue           
 
-def get_details_s1(angle,lr,ud,pos_e,pos_s,toinvert,bluevel,contact_top,contact_sides,contact_RODs,contact_RODe,contact_RODt,contact_BLUEe,contact_BLUEt,contact_BLUEs): #s1 for side=1
+def get_details_s1(y,angle,lr,ud,pos_e,pos_s,toinvert,bluevel,contact_top,contact_sides,contact_RODs,contact_RODe,contact_RODt,contact_BLUEe,contact_BLUEt,contact_BLUEs): #s1 for side=1
 
     if contact_top: 
         ud=-1
@@ -363,7 +374,9 @@ def get_details_s1(angle,lr,ud,pos_e,pos_s,toinvert,bluevel,contact_top,contact_
         angle=180-angle
 
     elif contact_BLUEt: #if the ball is touching the top face of the ball
+        
         if bluevel==0:
+            y-=2
             angle=180-angle
             ud=invert(ud)
 
@@ -372,22 +385,28 @@ def get_details_s1(angle,lr,ud,pos_e,pos_s,toinvert,bluevel,contact_top,contact_
             if lr==0:
                 angle=(angle+180)/2
                 lr=1
+                y-=2
             elif lr==1:
                 angle=180-angle
                 angle=(180+angle)/2
+                y-=2
             elif lr==-1:
                 angle=180-angle
                 angle=(90+angle)/2
+                y-=2
 
         elif bluevel==-1:
             ud=invert(ud)
             if lr==0:
+                y-=2
                 angle=(angle+0)/2
                 lr=-1
             elif lr==1:
+                y-=2
                 angle=180-angle
                 angle=(90+angle)/2
             elif lr==-1:
+                y-=2
                 angle=180-angle
                 angle=angle/2
             
@@ -416,6 +435,7 @@ def get_details_s1(angle,lr,ud,pos_e,pos_s,toinvert,bluevel,contact_top,contact_
                 if pos_e=='rt':
                     ud=1
                     lr=invert(lr)
+            y-=2
 
     elif contact_BLUEs:
         if lr==0:
@@ -433,10 +453,15 @@ def get_details_s1(angle,lr,ud,pos_e,pos_s,toinvert,bluevel,contact_top,contact_
                 angle=180-angle
                 lr=invert(lr)
 
-    return angle,lr,ud
+    return angle,lr,ud,y
 
                  
 def get_ballpos(x,y,angle,lr,ud):
+
+    if x<0:
+        x=1
+    if x+72>800:
+        x=799-72
 
     if lr==0:
         if ud==-1:
@@ -456,13 +481,13 @@ def get_ballpos(x,y,angle,lr,ud):
             #angle will be more than 90, thus it has to be made acute
             temp=180-angle #makes it acute
             m=math.tan(math.radians(temp)) #finds m (tan theta)
-            dx=2/m
-            y-=2
+            dx=3/m
+            y-=3
             x+=dx
         elif ud==-1: #moving downwards and angle is already acute 
             m=math.tan(math.radians(angle))
-            dx=2/m
-            y+=2
+            dx=3/m
+            y+=3
             x+=dx
    
         return x,y,angle,lr,ud
@@ -470,14 +495,14 @@ def get_ballpos(x,y,angle,lr,ud):
     if lr==-1:
         if ud==1:
             m=math.tan(math.radians(angle))
-            dx=2/m
-            y-=2
+            dx=3/m
+            y-=3
             x-=dx
         if ud==-1: #angle is obtuse as it is going to the left downwards
             temp=180-angle
             m=math.tan(math.radians(temp))
-            dx=2/m
-            y+=2
+            dx=3/m
+            y+=3
             x-=dx
          
         return x,y,angle,lr,ud
