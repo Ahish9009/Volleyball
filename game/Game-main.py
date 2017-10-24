@@ -43,6 +43,9 @@ tracker_Bx=[0,0,0,0,0]
 tracker_x=[0,0,0,0,0]
 tracker_y=[0,0,0,0,0]
 
+
+jumpblue=False
+
 #to repeat
 pg.key.set_repeat(10, 5)
 
@@ -57,6 +60,11 @@ i=True
 while i:
     
     if flag==0: #normal game
+        
+        if jumpblue:
+            y_blue,jumpblue,jumpbcount=fn.bluejump(y_blue,jumpblue,jumpbcount)
+            
+        
         #get velocity of blue player
         bluevel=fn.get_bluevel(tracker_Bx)
     
@@ -81,8 +89,10 @@ while i:
         contact_RODe,toinvert=fn.checkcontact_RODedge(x,y,tracker_y,lr,ud)
         #to check if the ball is in contact with the top of the rod
         contact_RODt=fn.checkcontact_RODtop(x,y,tracker_y)
+
+        #checks if the ball touches the red player
         
-        angle,lr,ud=fn.get_details_s1(angle,lr,ud,pos_e,pos_s,toinvert,bluevel,contact_top,contact_sides,contact_RODs,contact_RODe,contact_RODt,contact_BLUEe,contact_BLUEt,contact_BLUEs)
+        angle,lr,ud,y=fn.get_details_s1(y,angle,lr,ud,pos_e,pos_s,toinvert,bluevel,contact_top,contact_sides,contact_RODs,contact_RODe,contact_RODt,contact_BLUEe,contact_BLUEt,contact_BLUEs)
         
         x,y,angle,lr,ud=fn.get_ballpos(x,y,angle,lr,ud)
 
@@ -95,8 +105,12 @@ while i:
                 x_blue=fn.get_playerbpos(x,y,x_blue,y_blue,lr,side,tracker_x,'r')
             if event.key==pg.K_LEFT:
                 x_blue=fn.get_playerbpos(x,y,x_blue,y_blue,lr,side,tracker_x,'l')
+            if event.key==pg.K_SPACE:
+                if not jumpblue:
+                    jumpblue=True
+                    jumpbcount=0
 
-    if y+72==600:
+    if y+72>600:
         y=100
 
     screen.blit(bg, (0,0))
