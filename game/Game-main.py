@@ -8,12 +8,19 @@ pg.init()
 screen_size=(800,600)
 
 #loads and transforms images
-bg,rod,playerr,playerb,volleyball=fn.load_images()
+bg,rod,playerr,playerb,volleyball,overlay1,overlay2=fn.load_images()
 
 #loads fonts
 TNR1=pg.font.SysFont("Times New Roman", 50)
 TNR2=pg.font.SysFont("Times New Roman", 30)
-TNR3=pg.font.SysFont("Times New Roman", 50)
+
+PETC=TNR1.render('Press enter to exit...',1,(0,0,0))
+paused=TNR1.render('PAUSED',1,(0,0,0))
+welcome=TNR1.render('WELCOME!',1,(0,0,0))
+choice=TNR2.render('Select the difficult level:',1,(0,0,0))
+choice1=TNR2.render('Easy - Press 1',1,(0,0,0))
+choice2=TNR2.render('Medium - Press 2',1,(0,0,0))
+choice3=TNR2.render('Difficult - Press 3',1,(0,0,0))
 
 #initializes object for framerate
 clock=pg.time.Clock()
@@ -36,7 +43,7 @@ y=200
 xlast=600
 ylast=200
 
-flag=0 #for normal game run
+flag=-1 #for welcome screen
 
 #initial movement
 angle=90
@@ -71,25 +78,40 @@ pg.key.set_repeat(10, 5)
 
 i=True
 while i:
+    #initial check if a player has won
     scorer=TNR1.render(str(red_score)+' - '+str(blue_score),1,(0,0,0))
     bluetouch=TNR2.render(str(3-blue_touch),1,(50,50,50))
     
     if red_score==15:
-        redwon=TNR3.render('Sorry, the computer has won...',1,(0,0,0))
+        redwon=TNR1.render('Sorry, the computer has won...',1,(0,0,0))
         flag=1
     elif blue_score==15:
         flag=2
-        bluewon=TNR3.render('Congrats! You beat the computer!!',1,(0,0,0))
+        bluewon=TNR1.render('Congrats! You beat the computer!!',1,(0,0,0))
+
+    if flag==-1:
+        screen.blit(bg, (0,0))
+        screen.blit(welcome, (300,275))
+        screen.blit(choice, (250,350))
+        screen.blit(choice1, (250,380))
+        screen.blit(choice2, (250,410))
+        screen.blit(choice3, (250,440))
+        
+    if flag==3: #pauses
+        screen.blit(bg, (0,0))
+        screen.blit(paused, (300,275))
 
     if flag==1: #if red wins
         screen.blit(bg, (0,0))
         screen.blit(redwon, (50,250))
         screen.blit(scorer,(300,330))
+        screen.blit(PETC, (400,550))
 
     if flag==2: #if blue wins
         screen.blit(bg, (0,0))
         screen.blit(bluewon, (50,250))
         screen.blit(scorer,(300,330))
+        screen.blit(PETC, (400,550))
     
     if flag==0: #normal game
         
@@ -107,7 +129,7 @@ while i:
             y_blue,jumpblue,jumpbcount=fn.bluejump(y_blue,jumpblue,jumpbcount)
             
         #ai
-        x_red=fn.get_AI(side,lr,x,x_red)
+        x_red=fn.get_AI(side,lr,x,x_red,speed)
         
         #get velocity of blue player
         bluevel=fn.get_bluevel(tracker_Bx)
@@ -172,6 +194,11 @@ while i:
             blue_touch=0
 
         if y+72>600:
+            if side==1:
+                screen.blit(overlay1, (0,0))
+            if side==-1:
+                screen.blit(overlay2, (0,0))
+            pg.display.update()
             pg.time.wait(1000)
             if side==1:
                 red_score+=1
@@ -185,6 +212,8 @@ while i:
             red_touch,blue_touch=0,0
             
         if blue_touch==4:
+            screen.blit(overlay1, (0,0))
+            pg.display.update()
             pg.time.wait(1000)
             red_score+=1
             x=200
@@ -193,6 +222,8 @@ while i:
             angle=90
             blue_touch,blue_touch=0,0
         if red_touch==4:
+            screen.blit(overlay2, (0,0))
+            pg.display.update()
             pg.time.wait(1000)
             blue_score+=1
             x=600
@@ -222,7 +253,19 @@ while i:
             i=False
 
         if event.type==pg.KEYDOWN:
-            
+
+            if event.key==pg.K_1:
+                if flag==-1:
+                    speed=1
+                    flag=0
+            if event.key==pg.K_2:
+                if flag==-1:
+                    speed=2
+                    flag=0
+            if event.key==pg.K_3:
+                if flag==-1:
+                    speed=3
+                    flag=0
             if event.key==pg.K_RIGHT:
                 x_blue=fn.get_playerbpos(x,y,x_blue,y_blue,lr,side,tracker_x,'r')
             elif event.key==pg.K_LEFT:
@@ -231,7 +274,16 @@ while i:
                 if not jumpblue:
                     jumpblue=True
                     jumpbcount=0
-        
+            if event.key==pg.K_RETURN:
+                if flag==1 or flag==2:
+                    i=False
+            if event.key==pg.K_p:
+                if flag==3:
+                    flag=flag_o
+                elif flag!=3:
+                    flag_o=flag #sets original flag where it should come back to
+                    flag=3
+                           
     pg.display.update()
     clock.tick(100) #decides maximum fps
 
