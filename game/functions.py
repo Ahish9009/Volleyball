@@ -16,14 +16,18 @@ def load_images():
     playerr=pg.image.load('pictures/player red.jpg')
     playerb=pg.image.load('pictures/player blue.jpg')
     volleyball=pg.image.load('pictures/volleyball.png')
+    overlay1=pg.image.load('pictures/overlay1.png')
+    overlay2=pg.image.load('pictures/overlay2.png')
     #transforms images
     bg=pg.transform.scale(bg, (800,600))
     rod=pg.transform.scale(rod, (14,300))
     playerr=pg.transform.scale(playerr, (85,150))
     playerb=pg.transform.scale(playerb, (85,150))
     volleyball=pg.transform.scale(volleyball, (72,72)) #r=36
+    overlay1=pg.transform.scale(overlay1, (800,600))
+    overlay2=pg.transform.scale(overlay2, (800,600))
 
-    return bg,rod,playerr,playerb,volleyball
+    return bg,rod,playerr,playerb,volleyball,overlay1,overlay2
 
 def lr_checker(tracker_x,x):
     if tracker_x[1]>x:
@@ -104,26 +108,26 @@ def ballside(x,tracker_x,lr,side): #mainly for player position hence middle case
 
     return side
 
-def get_AI(side,lr,x,x_red):
+def get_AI(side,lr,x,x_red,speed):
     if side==-1:
         if lr==0:
             if x_red+40<x:
                 if x_red>0 and x_red+85<393:
-                    x_red+=2
+                    x_red+=speed
             elif x_red+40>x:
                 if x_red>0 and x_red+85<393:
-                    x_red-=2
+                    x_red-=speed
             elif x_red+40==x:
-                x_red-=2
+                x_red-=speed
             
         if lr==-1:
             if x_red+40>=x:
                 if x_red>0:
-                    x_red-=2
+                    x_red-=speed
         if lr==1:
             if x_red<=x:
                 if x_red+85<393:
-                    x_red+=2
+                    x_red+=speed
     return x_red
 
 def bluejump(y_blue,jumpblue,jumpbcount):
