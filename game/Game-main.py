@@ -81,7 +81,7 @@ while i:
     #initial check if a player has won
     scorer=TNR1.render(str(red_score)+' - '+str(blue_score),1,(0,0,0))
     bluetouch=TNR2.render(str(3-blue_touch),1,(50,50,50))
-    
+    redtouch=TNR2.render(str(3-red_touch),1,(50,50,50))
     if red_score==15:
         redwon=TNR1.render('Sorry, the computer has won...',1,(0,0,0))
         flag=1
@@ -114,7 +114,6 @@ while i:
         screen.blit(PETC, (400,550))
     
     if flag==0: #normal game
-        
         if delay_b: #delay to get contact as True after hitting the player once
             if delay_bcount==50:
                 delay_b=False
@@ -129,7 +128,7 @@ while i:
             y_blue,jumpblue,jumpbcount=fn.bluejump(y_blue,jumpblue,jumpbcount)
             
         #ai
-        x_red=fn.get_AI(side,lr,x,x_red,speed)
+        x_red=fn.get_AI(side,lr,x,y,x_red,speed)
         
         #get velocity of blue player
         bluevel=fn.get_bluevel(tracker_Bx)
@@ -169,7 +168,7 @@ while i:
         #to check if the ball is in contact with the side of the red player
         contact_REDs,pos_Rs=fn.checkcontact_REDside(x,y,x_red,y_red,tracker_x,lr)
 
-        angle,lr,ud,y=fn.get_details_s1(y,y_blue,angle,lr,ud,pos_Be,pos_Re,pos_s,pos_Rs,toinvert,bluevel,redvel,contact_top,contact_sides,contact_RODs,contact_RODe,contact_RODt,contact_BLUEe,contact_BLUEt,contact_BLUEs,contact_REDe,contact_REDt,contact_REDs)
+        angle,lr,ud,x,y=fn.get_details_s1(x,y,x_red,x_blue,y_blue,angle,lr,ud,pos_Be,pos_Re,pos_s,pos_Rs,toinvert,bluevel,redvel,contact_top,contact_sides,contact_RODs,contact_RODe,contact_RODt,contact_BLUEe,contact_BLUEt,contact_BLUEs,contact_REDe,contact_REDt,contact_REDs)
 
         if angle<25:
             angle=25
@@ -238,6 +237,7 @@ while i:
         screen.blit(playerb, (x_blue,y_blue))
         screen.blit(scorer, (350,0))
         screen.blit(bluetouch, (770,5))
+        screen.blit(redtouch, (10,5))
         screen.blit(volleyball, (x,y))
 
         lr=fn.lr_checker(tracker_x,x) #as lr can go wrong
@@ -278,6 +278,7 @@ while i:
                 if flag==1 or flag==2:
                     i=False
             if event.key==pg.K_p:
+                
                 if flag==3:
                     flag=flag_o
                 elif flag!=3:
