@@ -1,4 +1,5 @@
 #Volleyball simulation
+#Importing required Libraries
 import pygame as pg, math
 import functions as fn
 
@@ -56,6 +57,7 @@ tracker_Rx=[0,0,0,0,0]
 tracker_x=[0,0,0,0,0]
 tracker_y=[0,0,0,0,0]
 
+#Initialization of the scores of Red and Blue
 red_score=0
 blue_score=0
 red_touch=0
@@ -168,6 +170,8 @@ while i:
         #to check if the ball is in contact with the side of the red player
         contact_REDs,pos_Rs=fn.checkcontact_REDside(x,y,x_red,y_red,tracker_x,lr)
 
+        angle,lr,ud,y=fn.get_details_s1(y,y_blue,angle,lr,ud,pos_Be,pos_Re,pos_s,pos_Rs,toinvert,bluevel,redvel,contact_top,contact_sides,contact_RODs,contact_RODe,contact_RODt,contact_BLUEe,contact_BLUEt,contact_BLUEs,contact_REDe,contact_REDt,contact_REDs)
+        #Checks the angles
         angle,lr,ud,x,y=fn.get_details_s1(x,y,x_red,x_blue,y_blue,angle,lr,ud,pos_Be,pos_Re,pos_s,pos_Rs,toinvert,bluevel,redvel,contact_top,contact_sides,contact_RODs,contact_RODe,contact_RODt,contact_BLUEe,contact_BLUEt,contact_BLUEs,contact_REDe,contact_REDt,contact_REDs)
 
         if angle<25:
