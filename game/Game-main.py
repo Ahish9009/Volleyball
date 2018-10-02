@@ -126,7 +126,7 @@ while i:
                 delay_r=False
             delay_rcount+=1
         
-        if jumpblue:
+        if jumpblue: #condition for the blue player to jump and call of the blue jump function
             y_blue,jumpblue,jumpbcount=fn.bluejump(y_blue,jumpblue,jumpbcount)
             
         #ai
@@ -182,14 +182,14 @@ while i:
         
         x,y,angle,lr,ud=fn.get_ballpos(x,y,angle,lr,ud)
 
-        if contact_BLUEe or contact_BLUEt:
+        if contact_BLUEe or contact_BLUEt:  #to check if the call is in contact with the red player
             delay_b=True
             contact_BLUEe,contact_BLUEt=False,False
             delay_bcount=0
             blue_touch+=1
             red_touch=0
 
-        if contact_REDe or contact_REDt:
+        if contact_REDe or contact_REDt:  #to check if the ball is in contact with the red player
             delay_r=True
             contact_REDe,contact_REDt=False,False
             delay_rcount=0
@@ -214,7 +214,7 @@ while i:
             angle=90
             red_touch,blue_touch=0,0
             
-        if blue_touch==4:
+        if blue_touch==4:  # if the blue player has touched the ball 4 times increases the score of red player 
             screen.blit(overlay1, (0,0))
             pg.display.update()
             pg.time.wait(1000)
@@ -224,7 +224,7 @@ while i:
             lr,ud=0,-1
             angle=90
             blue_touch,blue_touch=0,0
-        if red_touch==4:
+        if red_touch==4:# if the red player has touched the ball 4 times increases the score of blue player 
             screen.blit(overlay2, (0,0))
             pg.display.update()
             pg.time.wait(1000)
@@ -292,4 +292,4 @@ while i:
     pg.display.update()
     clock.tick(100) #decides maximum fps
 
-pg.quit()
+pg.quit() #to quit the game 
