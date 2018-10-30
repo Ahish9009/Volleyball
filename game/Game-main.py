@@ -293,3 +293,5 @@ while i:
     clock.tick(100) #decides maximum fps
 
 pg.quit() #to quit the game 
+
+#hacktober t shirt plz
